@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Principal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  </head>
+  <body>
+    {% include "navbar.html" %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+              <br>
+              {% with messages = get_flashed_messages(with_categories=True) %}
+              {% if messages %}
+                  {% for category, message in messages %}
+                      <div class="alert alert-{{ 'danger' if category == 'ERROR' or category == 'PROHIBIDO' else 'success' }}" role="alert">
+                          {{ message }}
+                      </div>
+                  {% endfor %}
+              {% endif %}
+            {% endwith %}
+                <div class="card">
+                    <div class="card-body">
+                        <form method="post" action="{{url_for('agregar')}}"> 
+                            <div class="mb-3">
+                              <label for="texto" class="form-label">Escribi tu tarea:</label>
+                              <input type="text" class="form-control" name="texto" id="texto" autofocus>
+                            </div>
+                            <div class="mb-3">
+                                <label for="prioridad" class="form-label">Prioridad:</label>
+                                <select class="form-select" name="prioridad" id="prioridad">
+                                  {% for p in prioridades %}
+                                    <option value="{{p.0}}" {% if p.0 == 2 %}selected{% endif %}>{{p.1}}</option> 
+                                  {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                          </form>
+                    </div>
+                </div>
+            </div> <!--cierre col 1-->
+        </div> <!--cierre row 1-->
+        <br>
+        <div class="row">
+            <div class="col">
+              {% if tareas %} 
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Tarea</th>
+                        <th scope="col">Fecha</th>
+                        <th scope="col">Prioridad</th>
+                        <th scope="col">&nbsp;</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for t in tareas %}
+                        {% if t[4] == 1 %} 
+                        <tr class="table-danger">
+                        {%elif t[4] == 2%}
+                        <tr class="table-primary">
+                        {% else %}
+                        <tr class="table-secondary">
+                        {% endif %}
+                        <th scope="row">{{t[0]}}</th> <!--el indice 0 es tarea id-->
+                        <td>{{t[1]}}</td> <!--el indice 1 es tarea-->
+                        <td>{{t[6]}}</td> <!--el indice 6 es la fecha formateada a nuestro uso habitual-->
+                        <td>{{t[7]}}</td> <!--el indice 7 es el nombre de la prioridad-->
+                        <td class="text-end">
+                          <a href="{{url_for('generar_qr',tarea_id=t[0])}}" class="qr"><i class="btn btn-primary btn-sm bi bi-share "></i></a> 
+                          <a href="{{url_for('terminada',tarea_id=t[0])}}" class="terminada"><i class="btn btn-success btn-sm bi bi-check-circle-fill"></i></a> 
+                          <a href="{{url_for('borrar',tarea_id=t[0])}}" class="borrar"><i class="btn btn-danger btn-sm bi bi-trash-fill"></i></a>  
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  <br>
+                  <p class="text-end">
+                    <a href="{{url_for('exportar_excel')}}" class="btn btn-sm btn-success"><i class="bi bi-file-earmark-excel-fill"></i> Exportar a Excel</a>
+                  </p>
+                  {% else %}
+                  <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle"></i> No hay tareas
+                  </div>
+                  {% endif %} 
+            </div> <!--cierre col 2-->
+        </div> <!--cierre row 2-->
+    </div> <!--cierre container-->
+
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/6.0.0/bootbox.min.js" integrity="sha512-oVbWSv2O4y1UzvExJMHaHcaib4wsBMS5tEP3/YkMP6GmkwRJAa79Jwsv+Y/w7w2Vb/98/Xhvck10LyJweB8Jsw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      $(".borrar").click(function(e){
+        e.preventDefault(); 
+        var dir=$(this).prop("href")
+        bootbox.confirm("Estas seguro?",function(resultado){
+          if(resultado){ 
+            location.href=dir
+          }
+        })
+      })
+
+  document.addEventListener('DOMContentLoaded', function() { 
+    const switchElement = document.getElementById('oscuro'); 
+
+    // Verifica y aplica la preferencia guardada
+    const storedTheme = localStorage.getItem('theme'); 
+    if (storedTheme) { 
+      document.documentElement.setAttribute('data-bs-theme', storedTheme); 
+      switchElement.checked = storedTheme === 'dark'; 
+    } else {
+      // Configuración predeterminada
+      document.documentElement.setAttribute('data-bs-theme', 'light'); 
+      switchElement.checked = false; 
+    }
+
+    // Cambia la preferencia al interactuar con el interruptor
+    switchElement.addEventListener('change', function() { 
+      const newTheme = switchElement.checked ? 'dark' : 'light'; 
+      document.documentElement.setAttribute('data-bs-theme', newTheme); 
+      localStorage.setItem('theme', newTheme); 
+    });
+  });
+    </script>
+  </body>
+</html>

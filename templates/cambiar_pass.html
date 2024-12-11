@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Principal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  </head>
+  <body>
+    {% include "navbar.html" %}
+    <div class="container">
+        <div class="row">
+            <div class="col col-md-4 offset-md-4">
+                <br>
+                <h3 class="text-center">Nueva contraseña</h3>
+                <div class="card">
+                    <div class="card-body">
+                    {% with mes = get_flashed_messages(with_categories=True) %} 
+                        {% if mes: %}
+                            {% for category, message in mes %}
+                                <div class="alert alert-{{ 'danger' if category == 'ERROR' else 'success' }}" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %} 
+                    {% endwith %}
+                        <form method="post" action="{{url_for('cambiar_pass')}}"> 
+                            <div class="mb-3">
+                              <label for="pass_actual" class="form-label">Contraseña actual:</label>
+                              <input type="password" class="form-control" name="pass_actual" id="pass_actual" autofocus>
+                            </div>
+                            <div class="mb-3">
+                                <label for="pass_nueva" class="form-label">Contraseña nueva:</label>
+                                <input type="password" class="form-control" name="pass_nueva" id="pass_nueva">
+                            </div>
+                            <div class="mb-3">
+                                <label for="repetir_pass" class="form-label">Repetir contraseña nueva:</label>
+                                <input type="password" class="form-control" name="repetir_pass" id="repetir_pass">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cambiar</button>
+                          </form>
+                    </div>
+                </div>
+            </div> <!--cierre col 1-->
+        </div> <!--cierre row 1-->
+        <br>
+    </div> <!--cierre container-->
+
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/6.0.0/bootbox.min.js" integrity="sha512-oVbWSv2O4y1UzvExJMHaHcaib4wsBMS5tEP3/YkMP6GmkwRJAa79Jwsv+Y/w7w2Vb/98/Xhvck10LyJweB8Jsw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() { 
+          const switchElement = document.getElementById('oscuro'); 
+      
+          // Verifica y aplica la preferencia guardada
+          const storedTheme = localStorage.getItem('theme'); 
+          if (storedTheme) { 
+            document.documentElement.setAttribute('data-bs-theme', storedTheme); 
+            switchElement.checked = storedTheme === 'dark'; 
+          } else {
+            // Configuración predeterminada
+            document.documentElement.setAttribute('data-bs-theme', 'light'); 
+            switchElement.checked = false; 
+          }
+      
+          // Cambia la preferencia al interactuar con el interruptor
+          switchElement.addEventListener('change', function() { 
+            const newTheme = switchElement.checked ? 'dark' : 'light'; 
+            document.documentElement.setAttribute('data-bs-theme', newTheme); 
+            localStorage.setItem('theme', newTheme); 
+          });
+        });
+      </script>
+    </body>
+</html>
